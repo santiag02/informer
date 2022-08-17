@@ -190,23 +190,25 @@ def init_add_monitors():
     global session, SERVER_MODE, engine
     # Lets assign them all
     accounts = session.query(Account).all()
+    accounts_id = [item.id for item in accounts]
     channels = session.query(Channel).all()
-    account_index = 0
+    account_index = 1
     channel_count = 0
+    index = 0
 
     for channel in channels:
-        if account_index in accounts:
-            account = accounts[account_index]
-            logging.info(f'{sys._getframe().f_code.co_name}: Adding monitoring to channel {channel.channel_name} with account_id {account.account_id} to the database')
+        if account_index in accounts_id:
+            account = accounts_id[index]
+            logging.info(f'{sys._getframe().f_code.co_name}: Adding monitoring to channel {channel.channel_name} with account_id {account} to the database')
             session.add(Monitor(
                 channel_id=channel.id,
-                account_id=account.account_id,
+                account_id=account,
                 monitor_tcreate=datetime.now(),
                 monitor_tmodified=datetime.now()
             ))
             channel_count += 1
             if channel_count > 500:
-                account_index += 1
+                index += 1
                 channel_count = 0
     session.commit()
 

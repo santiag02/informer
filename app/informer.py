@@ -637,8 +637,8 @@ class TGInformer:
         # ----------------------
         # Telegram service login
         # ----------------------
-        logging.info(f'Logging in with account # {self.account.account_phone} ... \n')
-        session_file = self.account.account_phone.replace('+', '')
+        session_file = os.environ.get('TELEGRAM_ACCOUNT_USER_NAME')
+        logging.info(f'Logging in with account # {session_file} ... \n')
         self.client = TelegramClient(session_file, self.account.account_api_id, self.account.account_api_hash)
     
         # -----------------------
