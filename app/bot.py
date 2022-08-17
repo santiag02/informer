@@ -10,7 +10,7 @@ logging.getLogger().setLevel(logging.INFO)
 # -----------------
 # Load the ENV file
 # -----------------
-env_file = 'informer.env' if os.path.isfile('informer.env') else '../informer.env'
+env_file = str(Path(os.path.abspath(__file__)).parents[1].joinpath('informer.env'))
 logging.info(f'env_file: {env_file}')
 dotenv_path = Path(env_file)
 load_dotenv(dotenv_path=dotenv_path)
@@ -30,9 +30,9 @@ from informer import TGInformer
 # Read more: https://github.com/paulpierre/informer/
 
 try:
-    account_id = sys.argv[1]
+    account_id = os.environ.get("TELEGRAM_ACCOUNT_ID")
 except:
-    raise Exception('informer.py <account_id> - account_id is a required param')
+    raise Exception('Check your ID in TELEGRAM_ACCOUNT_ID from the file informer.env')
 
 if not account_id:
     raise Exception('Account ID required')

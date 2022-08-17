@@ -14,7 +14,7 @@ logging.getLogger().setLevel(logging.INFO)
 # -----------------
 # Load the ENV file
 # -----------------
-dotenv_path = Path('informer.env')
+dotenv_path = str(Path(os.path.abspath(__file__)).parents[1].joinpath('informer.env'))
 load_dotenv(dotenv_path=dotenv_path)
 
 Session = None

@@ -68,6 +68,7 @@ This is a functioning proof-of-concept project with known bugs. Feel free to for
 * Docker (optional)
 * Telegram (Desktop, Web or Mobile download: https://www.telegram.org/)
 * Burner app
+* MySQL/MariaDB
 
 ### Python packages
 * SQLAlchemy (1.3.11)
@@ -137,7 +138,24 @@ You can optionally fill in `TELEGRAM_NOTIFICATIONS_CHANNEL_ID` with your user na
 
 ### Initialize and authenticate session
 
-Make sure you are running python 3 and simply run `./quick_start.sh` in the directory.
+1. Install your database, MySQL/MariaDB
+   >sudo apt install mariadb-server
+2. Acess the MySQL and create your database [DABASE-NAME].
+	>sudo mysql <br>
+	>MariaDB [(none)]> create database informer_db; <br>
+	>MariaDB [(none)]> show datases;
+
+3. Create a user with access to your database
+   >MariaDB [(none)]>create user informer@localhost identified by "informer_P455w0rd!";
+
+4. Give access to the database that you create in the step 2
+   >MariaDB [(none)]>grant all privileges on informer_db.* to informer@localhost; <br>
+   >MariaDB [(none)]>exit;
+
+5. Pay attention to your configuration port at the informer.env file
+   >netstat -ltp <br>
+   >netstat -ltpn
+6. Make sure you are running python 3 and simply run `./quick_start.sh` in the directory.
 
 You must run this first so that you can authenticate with Telegram on the first run and generate a local session file
 

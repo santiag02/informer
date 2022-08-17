@@ -520,7 +520,7 @@ class TGInformer:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Set the message for the notification we're about to send in our monitor channel
-        message = f'⚠️ "{keyword}" mentioned by {sender_username} in => "{self.channel_meta[channel_id]["channel_title"]}" url: {self.channel_meta[channel_id]["channel_url"]}\n\n Message:\n"{message_text}\ntimestamp: {timestamp}'
+        message = f'⚠️ "{keyword}" mentioned by {sender_username} in => "{self.channel_meta[channel_id]["channel_title"]}" url: {self.channel_meta[channel_id]["channel_url"]}\n\n Message:\n"{message_text}"\ntimestamp: {timestamp}'
         logging.info(f'{sys._getframe().f_code.co_name} Sending notification {message}')
 
         # ----------------
@@ -638,7 +638,7 @@ class TGInformer:
         # Telegram service login
         # ----------------------
         logging.info(f'Logging in with account # {self.account.account_phone} ... \n')
-        session_file = 'session/' + self.account.account_phone.replace('+', '')
+        session_file = self.account.account_phone.replace('+', '')
         self.client = TelegramClient(session_file, self.account.account_api_id, self.account.account_api_hash)
     
         # -----------------------
