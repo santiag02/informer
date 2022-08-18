@@ -259,6 +259,25 @@ file when you instantiate the Telethon client:
 	Telegram’s 2FA . Note that you will need to login for a first time and 
 	authenticate when you first use the API.
 
+## Managing Multiple Bot Accounts
+
+As the bot runs and joins channel, you will see your client update in real time and display the new channels you have joined.
+
+![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/4.png)
+
+TIP: TelegramX is by far the better client to use for these purposes as it supports multiple login. Download here:
+
+* Android - https://play.google.com/store/apps/details?id=org.thunderdog.challegram&hl=en_US
+* iOS - https://apps.apple.com/us/app/telegram-x/id898228810
+
+
+## Google Sheets Integration
+The python library gspread is used for managing io with Google Sheets. You will need to have a Google Cloud Platform account and enable Google Drive APIs. Afterwards you must generate server credentials with a json api key.
+
+Instructions are here: https://www.twilio.com/blog/2017/02/an-easy-way-to-read-and-write-to-a-google-spreadsheet-in-python.html
+
+This is optional.
+
 # Locally run
 
 1. Install your database, MySQL/MariaDB
@@ -283,28 +302,8 @@ file when you instantiate the Telethon client:
 7. Run the script quick_start
    >./quick_start.sh
 
-## Managing Multiple Bot Accounts
-
-As the bot runs and joins channel, you will see your client update in real time and display the new channels you have joined.
-
-![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/4.png)
-
-TIP: TelegramX is by far the better client to use for these purposes as it supports multiple login. Download here:
-
-* Android - https://play.google.com/store/apps/details?id=org.thunderdog.challegram&hl=en_US
-* iOS - https://apps.apple.com/us/app/telegram-x/id898228810
-
-
-## Google Sheets Integration
-The python library gspread is used for managing io with Google Sheets. You will need to have a Google Cloud Platform account and enable Google Drive APIs. Afterwards you must generate server credentials with a json api key.
-
-Instructions are here: https://www.twilio.com/blog/2017/02/an-easy-way-to-read-and-write-to-a-google-spreadsheet-in-python.html
-
-This is optional.
-
-
 ## Known Bugs
-* Currently a channel must have already been joined in order to begin monitoring of keywords. It is likely you will need to run the `bot.py` twice, once to let it join channels and another time to monitor them. I’m aware of this glaring bug and will fix it in the next revision.
+* Currently a channel must have already been joined in order to begin monitoring of keywords. 
 
 
 ## Todo
