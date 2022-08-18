@@ -1,7 +1,7 @@
 ![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/informer-logo.gif)
 # Informer - Telegram Mass Surveillance
 
-## Update 17-08-2022
+## Update 08-17-2022
 * Fixed issues with multiple variable configuration
 * Upload channels directly for monitoring
 * Messages arriving functionally directly from the notification channel
