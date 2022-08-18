@@ -1,13 +1,10 @@
 ![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/informer-logo.gif)
 # Informer - Telegram Mass Surveillance
 
-## Update 08-23-2021
-* Updated to latest Telethon 1.23.0
-* Fixed database issues by migrating to docker-compose
-* Made Google Spreadsheets optional in setup
-* Secure ENV files for setup
-* Easier setup
-* Replaced docker-compose in lieu of App Engine bc AE sux
+## Update 17-08-2022
+* Fixed issues with multiple variable configuration
+* Upload channels directly for monitoring
+* Messages arriving functionally directly from the notification channel
 
 ## About
 **Informer (TGInformer) is a bot library that allows you to masquerade as multiple REAL users on telegram** and spy on 500+ Telegram channels **per account**. Details are logged to a MySQL database, a private Google Sheet and your own private channel for analysis.
@@ -138,24 +135,7 @@ You can optionally fill in `TELEGRAM_NOTIFICATIONS_CHANNEL_ID` with your user na
 
 ### Initialize and authenticate session
 
-1. Install your database, MySQL/MariaDB
-   >sudo apt install mariadb-server
-2. Acess the MySQL and create your database [DABASE-NAME].
-	>sudo mysql <br>
-	>MariaDB [(none)]> create database informer_db; <br>
-	>MariaDB [(none)]> show datases;
-
-3. Create a user with access to your database
-   >MariaDB [(none)]>create user informer@localhost identified by "informer_P455w0rd!";
-
-4. Give access to the database that you create in the step 2
-   >MariaDB [(none)]>grant all privileges on informer_db.* to informer@localhost; <br>
-   >MariaDB [(none)]>exit;
-
-5. Pay attention to your configuration port at the informer.env file
-   >netstat -ltp <br>
-   >netstat -ltpn
-6. Make sure you are running python 3 and simply run `./quick_start.sh` in the directory.
+Make sure you are running python 3 and simply run `./quick_start.sh` in the directory.
 
 You must run this first so that you can authenticate with Telegram on the first run and generate a local session file
 
@@ -278,6 +258,30 @@ file when you instantiate the Telethon client:
 	authentication information so you will not have to re-authenticate with 
 	Telegram’s 2FA . Note that you will need to login for a first time and 
 	authenticate when you first use the API.
+
+# Locally run
+
+1. Install your database, MySQL/MariaDB
+   >sudo apt install mariadb-server
+2. Acess the MySQL and create your database [DABASE-NAME].
+	>sudo mysql <br>
+	>MariaDB [(none)]> create database informer_db; <br>
+	>MariaDB [(none)]> show datases;
+
+3. Create a user with access to your database
+   >MariaDB [(none)]>create user informer@localhost identified by "informer_P455w0rd!";
+
+4. Give access to the database that you create in the step 2
+   >MariaDB [(none)]>grant all privileges on informer_db.* to informer@localhost; <br>
+   >MariaDB [(none)]>exit;
+
+5. Pay attention to your configuration port at the informer.env file
+   >netstat -ltp <br>
+   >netstat -ltpn
+
+6. Fill in all variables as shown above
+7. Run the script quick_start
+   >./quick_start.sh
 
 ## Managing Multiple Bot Accounts
 

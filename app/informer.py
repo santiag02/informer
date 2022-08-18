@@ -244,13 +244,6 @@ class TGInformer:
     # ===========================
     async def init_monitor_channels(self):
 
-        # ---------------------
-        # Let's start listening
-        # ---------------------
-        @self.client.on(events.NewMessage)
-        async def message_event_handler(event):
-            await self.filter_message(event)
-
         # -----------------------------
         # Update the channel data in DB
         # -----------------------------
@@ -276,10 +269,12 @@ class TGInformer:
         # Get the list of channels to monitor
         # -----------------------------------
         self.session = self.Session()
-        account = self.session.query(Account).first()
+        account = self.session.query(Account).first() # Account_id = 640090832
         monitors = self.session.query(Monitor).filter_by(account_id=account.account_id).all()
 
         channels_to_monitor = []
+        channels_id_list = [] 
+        channel_2_report_id = int(os.environ.get("TELEGRAM_NOTIFICATIONS_CHANNEL_ID"))
         for monitor in monitors:
             channel_data = {
                 'channel_id': monitor.channel.channel_id,
@@ -297,9 +292,20 @@ class TGInformer:
                 'channel_tcreate': monitor.channel.channel_tcreate
             }
 
+            local_id = monitor.channel.channel_id
+            if local_id != channel_2_report_id:
+                channels_id_list.append(monitor.channel.channel_id)
+
             if monitor.channel.channel_is_enabled is True:
                 channels_to_monitor.append(channel_data)
         self.session.close()
+
+        # ---------------------
+        # Let's start listening
+        # ---------------------
+        @self.client.on(events.NewMessage(chats=channels_id_list))
+        async def message_event_handler(event):
+            await self.filter_message(event)
 
         # -------------------------------
         # Iterate through channel objects
@@ -526,7 +532,7 @@ class TGInformer:
         # ----------------
         # Send the message
         # ----------------
-        await self.client.send_message(self.monitor_channel, message)
+        await self.client.send_message(int(self.monitor_channel), message)
 
         # -------------------------
         # Write to the Google Sheet
