@@ -1,5 +1,6 @@
-version: '3.5'
+version: '3.7'
 services:
+  
   # ================
   # Database Service
   # ================
@@ -12,6 +13,8 @@ services:
       - db_data:/var/lib/mysql
     ports:
     - "3307:3306"
+    networks:
+      - elk
     logging:
       driver: "json-file"
       options:
@@ -37,55 +40,102 @@ services:
       - db_informer
     links:
       - db_informer
+    networks:
+      - elk
 
+  # The 'setup' service runs a one-off script which initializes the
+  # 'logstash_internal' and 'kibana_system' users inside Elasticsearch with the
+  # values of the passwords defined in the '.env' file.
+  #
+  # This task is only performed during the *initial* startup of the stack. On all
+  # subsequent runs, the service simply returns immediately, without performing
+  # any modification to existing users.
+  setup:
+    container_name: setup_informer
+    build:
+      context: setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    init: true
+    volumes:
+      - setup:/state:Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
-    container_name: elastic
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
-    logging:
-        driver: "json-file"
-        options:
-            max-size: "10k"
-            max-file: "10"
-  
-  logstash:
     build:
-      context: .
-      dockerfile: Dockerfile-logstash
-    container_name: logstash
-    # restart: on-failure
-    depends_on:
-      - db_informer
-      - elasticsearch
+      context: elasticsearch/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
     volumes:
-      - ./volumes/logstash/pipeline/:/usr/share/logstash/pipeline/
-      - ./volumes/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./volumes/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      - ./volumes/logstash/config/queries/:/usr/share/logstash/config/queries/
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
+      - elasticsearch:/usr/share/elasticsearch/data:z
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      # Bootstrap password.
+      # Used to initialize the keystore during the initial startup of
+      # Elasticsearch. Ignored on subsequent runs.
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    networks:
+      - elk
     logging:
       driver: "json-file"
       options:
         max-size: "10k"
         max-file: "10"
+  
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+      - ./logstash/config/queries/query.sql:/usr/share/logstash/config/queries/query.sql:ro,Z
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+      - "50000:50000/tcp"
+      - "50000:50000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+    networks:
+      - elk
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+    depends_on:
+      - elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.9.3
-    container_name: kibana
-    environment:
-      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
-      - "SERVER_NAME=127.0.0.1"
+    build:
+      context: kibana/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
     ports:
-      - 5601:5601
+      - "5601:5601"
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    networks:
+      - elk
     depends_on:
       - elasticsearch
 
@@ -94,14 +144,20 @@ services:
   # ===============
   # available at http://localhost:9999
   # NOTE: this is totally optional, feel free to comment out below if prod
-  app_dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9999:8080
+  #app_dozzle:
+  #  container_name: dozzle
+  #  image: amir20/dozzle:latest
+  #  volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock
+  #  ports:
+  #    - 9999:8080
+
+networks:
+  elk:
+    driver: bridge
 
 volumes:
   db_data: {}
   app: {}
+  setup:
+  elasticsearch:
