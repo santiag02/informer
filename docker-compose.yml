@@ -1,42 +1,34 @@
 version: '3.5'
 services:
-#    --------------------------------------------------
-#        ____      ____                              
-#       /  _/___  / __/___  _________ ___  ___  _____
-#       / // __ \/ /_/ __ \/ ___/ __ `__ \/ _ \/ ___/
-#     _/ // / / / __/ /_/ / /  / / / / / /  __/ /    
-#    /___/_/ /_/_/  \____/_/  /_/ /_/ /_/\___/_/ v1.1
-#    
-#    --------------------------------------------------
-#    by @paulpierre Updated 2021-08-16
-#    https://github.com/paulpierre/informer
-#   
-
-
   # ================
   # Database Service
   # ================
   db_informer:
+    image: mysql:8
+    container_name: db_informer
     env_file:
       - informer.env
-    container_name: db_informer   
-    image: mysql:5.7
     volumes:
       - db_data:/var/lib/mysql
     ports:
     - "3307:3306"
-
+    logging:
+      driver: "json-file"
+      options:
+          max-size: "10k"
+          max-file: "10"
 
 # =========================
 # Informer Telegram Service
 # =========================
   app_informer:
+    container_name: app_informer
     env_file:
       - informer.env
-    
-    build: .
-    command: /bin/bash -c "sleep 15; python3 bot.py ${TELEGRAM_ACCOUNT_ID}"
-    container_name: app_informer
+    build: 
+      context: .
+      dockerfile: Dockerfile-informer
+    command: /bin/bash -c "sleep 15; python3 build_database.py; python3 bot.py"
     volumes:
       - app/:/usr/local/app
     ports:
@@ -45,6 +37,57 @@ services:
       - db_informer
     links:
       - db_informer
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: elastic
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./volumes/elasticsearch:/usr/share/elasticsearch/data
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "10k"
+            max-file: "10"
+  
+  logstash:
+    build:
+      context: .
+      dockerfile: Dockerfile-logstash
+    container_name: logstash
+    # restart: on-failure
+    depends_on:
+      - db_informer
+      - elasticsearch
+    volumes:
+      - ./volumes/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./volumes/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./volumes/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./volumes/logstash/config/queries/:/usr/share/logstash/config/queries/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10k"
+        max-file: "10"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.3
+    container_name: kibana
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+      - "SERVER_NAME=127.0.0.1"
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
 
   # ===============
   # Logging service
