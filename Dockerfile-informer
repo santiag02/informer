@@ -5,4 +5,3 @@ RUN apk update && apk upgrade && \
 COPY app /usr/local/app
 WORKDIR /usr/local/app
 RUN pip3 install -r requirements.txt
-

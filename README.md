@@ -1,10 +1,10 @@
 ![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/informer-logo.gif)
 # Informer - Telegram Mass Surveillance
 
-## Update 08-17-2022
-* Fixed issues with multiple variable configuration
-* Upload channels directly for monitoring
-* Messages arriving functionally directly from the notification channel
+## Update 09-04-2022
+* Run once and works
+* Notifications coming directly to kibana and telegram notification channel
+* Created a docker-compose to Informer + MySQL + ELK
 
 ## About
 **Informer (TGInformer) is a bot library that allows you to masquerade as multiple REAL users on telegram** and spy on 500+ Telegram channels **per account**. Details are logged to a MySQL database, a private Google Sheet and your own private channel for analysis.
@@ -167,25 +167,6 @@ To get the channel ID simply run `python3 bot.py <TELEGRAM_ACCOUNT_ID>` in the `
 When the script loads, it will display all the channels you are in, simply copy this value and put it in the `TELEGRAM_NOTIFICATIONS_CHANNEL_ID` parameter of the `informer.env` file and kill the script. You're now ready to run Informer.
 
 
-### Running Docker Compose
-After running `quick_start.sh` you can run docker compose by:
-
-* running `./start.sh` to build the Docker containers which include the MySQL database
-
-![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/16.png)
-
-
-* Run `./stop.sh` to stop the containers
-
-* Run `./clean.sh` to remove an dangling containers and volumes. ** NOTE ** this will RESET the database and you will lose all your data.
-
-A few things to note:
-
-Before you were required to run your own MySQL instance and this created some issues with connection string compatability and versioning. In this update, it is just created for you and persisted on disk.
-
-Additionally Dozzle is provided so that you may view logs in your browser, simply go to http://localhost:9999 and click on the `app_informer` container.
-
-
 ### Create a telegram account with Burner App
 
 If you do not want to use your own phone number and want to run the Informer bot with some degree of anonymity you can use the Burner App available on iOS and Android.
@@ -278,7 +259,8 @@ Instructions are here: https://www.twilio.com/blog/2017/02/an-easy-way-to-read-a
 
 This is optional.
 
-# Locally run
+# Informer Execution
+## Locally run
 
 1. Install your database, MySQL/MariaDB
    >sudo apt install mariadb-server
@@ -302,12 +284,54 @@ This is optional.
 7. Run the script quick_start
    >./quick_start.sh
 
-## Known Bugs
-* Currently a channel must have already been joined in order to begin monitoring of keywords. 
+## Running Docker Compose - Only Informer
+After running `quick_start.sh` you can run docker compose by:
+
+* running `./start.sh` to build the Docker containers which include the MySQL database
+
+![image](https://raw.githubusercontent.com/paulpierre/informer/master/github/screenshots/16.png)
+
+
+* Run `./stop.sh` to stop the containers
+
+* Run `./clean.sh` to remove an dangling containers and volumes. ** NOTE ** this will RESET the database and you will lose all your data.
+
+A few things to note:
+
+Before you were required to run your own MySQL instance and this created some issues with connection string compatability and versioning. In this update, it is just created for you and persisted on disk.
+
+Additionally Dozzle is provided so that you may view logs in your browser, simply go to http://localhost:9999 and click on the `app_informer` container.
+
+## Running Docker Compose with: Informer, MySQL & ELK
+
+In this model you'll receive all new notifications at your Kibana and telegram informer chat.
+
+|![](github/screenshots/informer-elk.png)|
+|:---:|
+|Notification at Kibana|
+
+To run all this tool together.
+
+>docker-compose up -d
+
+### Docker commands
+
+This commands are usefull if you don't have much experience with docker.
+
+- List all dockers running:
+	>docker ps
+- Stop the docker containers at execution:
+	>docker-compose down
+- Stop and clean/remove all saved information from the containers:
+	>docker-compose down --volumes
+- Check the logs of a container
+	>docker logs [CONTAINER-ID OR CONTAINER-NAME]
 
 
 ## Todo
-* Create user interface dashboard for bot management
+* Have only one configuration file
+* Create a json file for map the keywords
+* Manage at run time some data
 	* Create new accounts
 	* Add / remove channels
 	* Add / remove keywords to monitor
