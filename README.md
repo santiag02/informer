@@ -306,7 +306,7 @@ Additionally Dozzle is provided so that you may view logs in your browser, simpl
 
 In this model you'll receive all new notifications at your Kibana and telegram informer chat.
 
-|![](github/screenshots/informer-elk.png)|
+|![](https://github.com/santiag02/informer/raw/master/github/screenshots/informer-elk.png)|
 |:---:|
 |Notification at Kibana|
 
