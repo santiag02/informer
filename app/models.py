@@ -36,7 +36,7 @@ class Channel(Base):
     """
     __tablename__ = 'channel'
     id = Column(Integer, primary_key=True, index=True)
-    channel_id = Column(Integer, unique=True, index=True, nullable=True) # The URL can come first but the channel ID populated later
+    channel_id = Column(Integer, unique=True, index=True, nullable=False) # The URL can come first but the channel ID populated later
     channel_name = Column(String(256), default=None, nullable=True)
     channel_title = Column(String(256), default=None, nullable=True)
     channel_url = Column(String(256), nullable=True)

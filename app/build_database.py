@@ -108,7 +108,8 @@ def init_add_channels():
                 print(f'Adding channel {row[0]} => {row[1]}')
                 CHANNELS.append({
                     'channel_name': row[0],
-                     'channel_url': row[1]
+                     'channel_url': row[1],
+                     'channel_id': row[2]
                                  })
             line_count += 1
 

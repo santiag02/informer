@@ -50,4 +50,3 @@ if __name__ == '__main__':
         google_credentials_path = os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
         google_sheet_name = os.environ['GOOGLE_SHEET_NAME']
     )
-    informer.init()

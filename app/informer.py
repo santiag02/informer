@@ -292,14 +292,6 @@ class TGInformer:
                 'channel_tcreate': monitor.channel.channel_tcreate
             }
 
-            """ if not monitor.channel.channel_title: # At the first run all channel does not have channel_id, only name and url from the csv file
-                channel_info = await self.get_channel_info_by_url(monitor.channel.channel_url)
-                channel_data['channel_id'] = channel_info['channel_id'] """
-                #channel_data['channel_title'] = channel_info['channel_title']
-                #channel_data['channel_is_broadcast'] = channel_info['is_broadcast']
-                #channel_data['channel_is_megagroup'] = channel_info['is_mega_group']
-                #channel_data['channel_access_hash'] = channel_info['channel_access_hash']
-
             if channel_data['channel_id'] != channel_2_report_id:
                 channels_id_list.append(channel_data['channel_id'])
 
@@ -324,8 +316,8 @@ class TGInformer:
             # -------------------------------
             # We have sufficient channel data
             # -------------------------------
-            #if channel['channel_id']:
-            if channel['channel_title']:
+            if channel['channel_id']:
+            #if channel['channel_title']:
                 self.channel_list.append(channel['channel_id'])
                 logging.info(f"Adding channel {channel['channel_name']} to monitoring w/ ID: {channel['channel_id']} hash: {channel['channel_access_hash']}")
 
