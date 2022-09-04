@@ -184,7 +184,7 @@ class TGInformer:
     async def get_channel_info_by_url(self, url):
         logging.info(f'{sys._getframe().f_code.co_name}: Getting channel info with url: {url}')
         channel_hash = utils.parse_username(url)[0]
-
+        channel = None
         # -----------------------------------------
         # Test if we can get entity by channel hash
         # -----------------------------------------
@@ -269,7 +269,7 @@ class TGInformer:
         # Get the list of channels to monitor
         # -----------------------------------
         self.session = self.Session()
-        account = self.session.query(Account).first() # Account_id = 640090832
+        account = self.session.query(Account).first()
         monitors = self.session.query(Monitor).filter_by(account_id=account.account_id).all()
 
         channels_to_monitor = []
@@ -292,9 +292,16 @@ class TGInformer:
                 'channel_tcreate': monitor.channel.channel_tcreate
             }
 
-            local_id = monitor.channel.channel_id
-            if local_id != channel_2_report_id:
-                channels_id_list.append(monitor.channel.channel_id)
+            """ if not monitor.channel.channel_title: # At the first run all channel does not have channel_id, only name and url from the csv file
+                channel_info = await self.get_channel_info_by_url(monitor.channel.channel_url)
+                channel_data['channel_id'] = channel_info['channel_id'] """
+                #channel_data['channel_title'] = channel_info['channel_title']
+                #channel_data['channel_is_broadcast'] = channel_info['is_broadcast']
+                #channel_data['channel_is_megagroup'] = channel_info['is_mega_group']
+                #channel_data['channel_access_hash'] = channel_info['channel_access_hash']
+
+            if channel_data['channel_id'] != channel_2_report_id:
+                channels_id_list.append(channel_data['channel_id'])
 
             if monitor.channel.channel_is_enabled is True:
                 channels_to_monitor.append(channel_data)
@@ -317,7 +324,8 @@ class TGInformer:
             # -------------------------------
             # We have sufficient channel data
             # -------------------------------
-            if channel['channel_id']:
+            #if channel['channel_id']:
+            if channel['channel_title']:
                 self.channel_list.append(channel['channel_id'])
                 logging.info(f"Adding channel {channel['channel_name']} to monitoring w/ ID: {channel['channel_id']} hash: {channel['channel_access_hash']}")
 
@@ -665,8 +673,6 @@ class TGInformer:
         count = 0
         while True:
             count +=1
-            logging.info('### {count} Running bot interval')
+            logging.info(f'### {count} Running bot interval')
             await self.init_keywords()
             await asyncio.sleep(self.KEYWORD_REFRESH_WAIT)
-
-    
