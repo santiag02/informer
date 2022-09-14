@@ -1,0 +1,30 @@
+[
+	{
+        "keyword_description": "Binance",
+        "keyword_regex": "(binance|bnb)"
+    },
+    {
+        "keyword_description": "Huobi",
+        "keyword_regex": "(huobi)"
+    },
+    {
+        "keyword_description": "Bittrex",
+        "keyword_regex": "(bittrex)"
+    },
+    {
+        "keyword_description": "Bitfinex",
+        "keyword_regex": "(bitfinex)"
+    },
+    {
+        "keyword_description": "Coinbase",
+        "keyword_regex": "(coinbase)"
+    },
+    {
+        "keyword_description": "Kraken",
+        "keyword_regex": "(kraken)"
+    },
+    {
+        "keyword_description": "Poloniex",
+        "keyword_regex": "(poloniex)"
+    }
+]

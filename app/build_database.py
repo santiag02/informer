@@ -1,8 +1,8 @@
-
 import csv
 import sys
 import os
 import logging
+import json
 from dotenv import load_dotenv
 from pathlib import Path
 import sqlalchemy as db
@@ -14,7 +14,8 @@ logging.getLogger().setLevel(logging.INFO)
 # -----------------
 # Load the ENV file
 # -----------------
-dotenv_path = str(Path(os.path.abspath(__file__)).parents[1].joinpath('informer.env'))
+root_path = str(Path(os.path.abspath(__file__)).parents[1])
+dotenv_path = Path(root_path).joinpath('informer.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 Session = None
@@ -140,37 +141,9 @@ def init_add_channels():
 # ==============================
 def init_add_keywords():
     global session, SERVER_MODE, engine
-    KEYWORDS = [
-        {
-            'keyword_description': 'Binance',
-            'keyword_regex': '(binance|bnb)'
-        },
-        {
-            'keyword_description': 'Huobi',
-            'keyword_regex': '(huobi)'
-        },
-        {
-            'keyword_description': 'Bittrex',
-            'keyword_regex': '(bittrex)'
-        },
-        {
-            'keyword_description': 'Bitfinex',
-            'keyword_regex': '(bitfinex)'
-        },
-        {
-            'keyword_description': 'Coinbase',
-            'keyword_regex': '(coinbase)'
-        },
-        {
-            'keyword_description': 'Kraken',
-            'keyword_regex': '(kraken)'
-        },
-        {
-            'keyword_description': 'Poloniex',
-            'keyword_regex': '(poloniex)'
-        },
 
-    ]
+    f = open(Path(root_path).joinpath('keywords.json'))
+    KEYWORDS = json.load(f)
 
     for keyword in KEYWORDS:
         logging.info(f"{sys._getframe().f_code.co_name}: Adding keyword {keyword['keyword_description']} to the database")
